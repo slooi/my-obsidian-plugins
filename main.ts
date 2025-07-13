@@ -1,36 +1,39 @@
 import { Plugin, Menu, TFile, Notice } from 'obsidian';
 
-export default class ImageRightClickCopyPlugin extends Plugin {
+export default class MyToolKitPlugin extends Plugin {
 	async onload() {
 		// Add context menu item to images in preview
 		this.registerDomEvent(document, 'contextmenu', async (event: MouseEvent) => {
-			const target = event.target as HTMLElement;
-
-			// Only trigger on <img> elements
-			if (target.tagName === 'IMG') {
-				const img = target as HTMLImageElement;
-
-				// Create our own menu
-				const menu = new Menu();
-				menu.addItem((item) => {
-					item.setIcon('clipboard-copy')
-						.setTitle('Copy to clipboard')
-						.onClick(async () => {
-							await copyImageToClipboardAsPng(img);
-						});
-				});
-
-				// Open at mouse position
-				menu.showAtPosition({ x: event.pageX, y: event.pageY });
-
-				// Prevent default Obsidian menu
-				event.preventDefault();
-			}
+			await imageRightClickCopyFeature(event)
 		});
 	}
 }
 
 
+async function imageRightClickCopyFeature(event: MouseEvent) {
+	const target = event.target as HTMLElement;
+
+	// Only trigger on <img> elements
+	if (target.tagName === 'IMG') {
+		const img = target as HTMLImageElement;
+
+		// Create our own menu
+		const menu = new Menu();
+		menu.addItem((item) => {
+			item.setIcon('clipboard-copy')
+				.setTitle('Copy to clipboard')
+				.onClick(async () => {
+					await copyImageToClipboardAsPng(img);
+				});
+		});
+
+		// Open at mouse position
+		menu.showAtPosition({ x: event.pageX, y: event.pageY });
+
+		// Prevent default Obsidian menu
+		event.preventDefault();
+	}
+}
 
 function copyImageToClipboardAsPng(img: HTMLImageElement) {
 	try {
