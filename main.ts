@@ -1,11 +1,64 @@
-import { Plugin, Menu, TFile, Notice } from 'obsidian';
+import { Plugin, Menu, TFile, Notice, App, PluginManifest } from 'obsidian';
+import { EditorState, Prec } from "@codemirror/state";
+import { EditorView, keymap } from "@codemirror/view";
 
 export default class MyToolKitPlugin extends Plugin {
+	insertTabsOn: boolean;
+	constructor(app: App, manifest: PluginManifest) {
+		super(app, manifest);
+		this.insertTabsOn = true
+	}
 	async onload() {
 		// Add context menu item to images in preview
 		this.registerDomEvent(document, 'contextmenu', async (event: MouseEvent) => {
+			console.log("AAAAAAAAASKDJASKJDAKJSD ASDKJASH DKAHKDHASKDH")
 			await imageRightClickCopyFeature(event)
 		});
+
+		this.registerEditorExtension(
+			Prec.highest(
+				keymap.of([
+					{
+						key: "Tab",
+						run: (view: EditorView) => {
+							if (!this.insertTabsOn) return false;
+
+							// Get editor from active view
+							const editor = this.app.workspace.activeEditor?.editor;
+							if (!editor) return false;
+
+							// Insert a real tab character
+							editor.replaceSelection("\t");
+
+							return true; // prevent further handling
+						}
+					}
+				])
+			)
+		);
+
+
+
+		// ✅ Add icon to the status bar
+		const statusBarItemEl = this.addStatusBarItem();
+		// statusBarItemEl.setAttr("aria-label", "MyToolKit Plugin");
+
+		const textSpan = document.createElement("span");
+		const renderTabToIndentStatusBar = () => {
+			textSpan.textContent = `Insert tab chars: ${this.insertTabsOn ? "ON" : "OFF"}`;
+		}
+		statusBarItemEl.appendChild(textSpan);
+		statusBarItemEl.addClass("toggle-tab-feature")
+		statusBarItemEl.insertAdjacentHTML("afterend", "<style>.toggle-tab-feature:hover{background-color:var(--background-modifier-hover)}</style>")
+		statusBarItemEl.addEventListener("click", e => {
+			this.insertTabsOn = !this.insertTabsOn
+			console.log("this.insertTabsOn", this.insertTabsOn)
+			renderTabToIndentStatusBar()
+		})
+		renderTabToIndentStatusBar()
+		// Text next to it:
+
+
 	}
 }
 
