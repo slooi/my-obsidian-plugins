@@ -5,6 +5,7 @@ A personal collection of features which extend obsidian functionality
 - images
   - right click copy img to clipboard
 - insert tabs when tab key is pressed
+  - Use `ctrl-Shift-d` to toggle feature
 
 
 ### How to develop more features

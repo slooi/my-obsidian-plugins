@@ -15,25 +15,35 @@ export default class MyToolKitPlugin extends Plugin {
 			await imageRightClickCopyFeature(event)
 		});
 
+		// Create the keymap
+		const keyBindings = [
+			{
+				key: "Tab",
+				run: (view: EditorView) => {
+					if (!this.insertTabsOn) return false;
+
+					// Get editor from active view
+					const editor = this.app.workspace.activeEditor?.editor;
+					if (!editor) return false;
+
+					editor.replaceSelection("\t");
+					return true; // prevent further handling
+				}
+			},
+			{
+				key: "Mod-Shift-d",
+				run: () => {
+					this.insertTabsOn = !this.insertTabsOn;
+					console.log("Toggled insertTabsOn:", this.insertTabsOn);
+					new Notice(`Insert tab chars: ${renderTabToIndentStatusBar()}`);
+					return true;
+				}
+			}
+		];
+
 		this.registerEditorExtension(
 			Prec.highest(
-				keymap.of([
-					{
-						key: "Tab",
-						run: (view: EditorView) => {
-							if (!this.insertTabsOn) return false;
-
-							// Get editor from active view
-							const editor = this.app.workspace.activeEditor?.editor;
-							if (!editor) return false;
-
-							// Insert a real tab character
-							editor.replaceSelection("\t");
-
-							return true; // prevent further handling
-						}
-					}
-				])
+				keymap.of(keyBindings)
 			)
 		);
 
@@ -41,11 +51,12 @@ export default class MyToolKitPlugin extends Plugin {
 
 		// ✅ Add icon to the status bar
 		const statusBarItemEl = this.addStatusBarItem();
-		// statusBarItemEl.setAttr("aria-label", "MyToolKit Plugin");
 
 		const textSpan = document.createElement("span");
 		const renderTabToIndentStatusBar = () => {
-			textSpan.textContent = `Insert tab chars: ${this.insertTabsOn ? "ON" : "OFF"}`;
+			const onOffText = `${this.insertTabsOn ? "ON" : "OFF"}`
+			textSpan.textContent = `Insert tab chars: ${onOffText}`;
+			return onOffText
 		}
 		statusBarItemEl.appendChild(textSpan);
 		statusBarItemEl.addClass("toggle-tab-feature")
