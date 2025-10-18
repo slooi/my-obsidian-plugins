@@ -2,6 +2,8 @@ import { Plugin, Menu, TFile, Notice, App, PluginManifest } from 'obsidian';
 import { EditorState, Prec } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 
+const TOGGLE_TAB_FUNCTIONALITY_HOTKEY = "Mod-Shift-d"
+
 export default class MyToolKitPlugin extends Plugin {
 	insertTabsOn: boolean;
 	constructor(app: App, manifest: PluginManifest) {
@@ -31,7 +33,7 @@ export default class MyToolKitPlugin extends Plugin {
 				}
 			},
 			{
-				key: "Mod-Shift-d",
+				key: TOGGLE_TAB_FUNCTIONALITY_HOTKEY,
 				run: () => {
 					this.insertTabsOn = !this.insertTabsOn;
 					console.log("Toggled insertTabsOn:", this.insertTabsOn);
@@ -51,7 +53,7 @@ export default class MyToolKitPlugin extends Plugin {
 
 		// ✅ Add icon to the status bar
 		const statusBarItemEl = this.addStatusBarItem();
-
+		statusBarItemEl.setAttr("title", `${TOGGLE_TAB_FUNCTIONALITY_HOTKEY}`);
 		const textSpan = document.createElement("span");
 		const renderTabToIndentStatusBar = () => {
 			const onOffText = `${this.insertTabsOn ? "ON" : "OFF"}`
